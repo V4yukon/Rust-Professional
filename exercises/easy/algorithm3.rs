@@ -5,7 +5,21 @@
 */
 
 
-fn sort<T>(array: &mut [T]){
+fn sort<T: Copy + PartialOrd>(array: &mut [T]){
+    let n = array.len();;
+    if n <=1 {
+        return;
+    } else {
+        for i in 1..n {
+            let key = array[i];
+            let mut j = i;
+            while j > 0 && array[j - 1] > key{
+                array[j] = array[j - 1];
+                j -=1;
+            }
+            array[j] = key;
+        }
+    }
 	//TODO
 }
 #[cfg(test)]
