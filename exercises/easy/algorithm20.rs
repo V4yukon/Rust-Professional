@@ -9,9 +9,15 @@
 
 use std::fmt::{self, Display, Formatter};
 
-pub fn get_sum(a: i32, b: i32) -> i32 {
+pub fn get_sum(mut a: i32, mut b: i32) -> i32 {
+    while b != 0 {
+        let carry = (a & b) << 1; 
+        a ^= b; //first XOR,then get value;
+        b = carry; 
+    }
+    a
     // TODO: Implement the logic to calculate the sum of two integers without using `+`
-    0 // Placeholder return value
+     // Placeholder return value
 }
 
 #[cfg(test)]

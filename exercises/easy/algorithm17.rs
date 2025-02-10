@@ -8,12 +8,16 @@
 
     Hint: You can solve this problem using sorting, hash sets, or the two-pointer technique.
 */
-
+use std::collections::HashSet;
 use std::fmt::{self, Display, Formatter};
 
 pub fn intersection(nums1: Vec<i32>, nums2: Vec<i32>) -> Vec<i32> {
+    let set1: HashSet<i32> = nums1.into_iter().collect(); // 存入 HashSet 去重
+    let set2: HashSet<i32> = nums2.into_iter().collect(); // 存入 HashSet 去重
+
+    set1.intersection(&set2).cloned().collect() // 取交集并转换为 Vec
     // TODO: Implement the logic to find the intersection of two arrays
-    Vec::new() // Placeholder return value
+    // Placeholder return value
 }
 
 #[cfg(test)]
