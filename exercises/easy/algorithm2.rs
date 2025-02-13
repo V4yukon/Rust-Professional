@@ -72,100 +72,22 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn reverse(&mut self){
-    // 如果链表为空或只有一个元素，不需要反转
-    if self.length <= 1 {
-        return;
-    }
-
-    let mut current = self.start;
-    let mut prev: Option<NonNull<Node<T>>> = None;
-
-    // 更新 end 指针为原来的 start
-    self.end = current;
-
-    while let Some(mut current_ptr) = current {
-        unsafe {
-            // 保存下一个节点
-            let next = (*current_ptr.as_ptr()).next;
-            
-            // 反转当前节点的指针
-            (*current_ptr.as_ptr()).next = prev;
-            (*current_ptr.as_ptr()).prev = next;
-
-            // 移动指针
-            prev = current;
-            current = next;
-        }
-    }
-
-    // 更新 start 指针为原来的 end
-    self.start = prev;
-}
-关键修改：
-
-get 方法改为迭代实现，避免递归导致的栈溢出
-reverse 方法更加明确地处理 start 和 end 指针
-使用迭代方式反转链表的指针
-这个实现应该能够：
-
-避免栈溢出
-正确反转双向链表
-通过提供的测试用例
-完整的修改示例：
-
-Copy
-impl<T> LinkedList<T> {
-    pub fn get(&self, index: i32) -> Option<&T> {
-        if index < 0 || index >= self.length as i32 {
-            return None;
-        }
-
-        let mut current = self.start;
-        let mut current_index = 0;
-
-        while let Some(node_ptr) = current {
-            unsafe {
-                if current_index == index {
-                    return Some(&(*node_ptr.as_ptr()).val);
-                }
-                current = (*node_ptr.as_ptr()).next;
-                current_index += 1;
-            }
-        }
-
-        None
-    }
-
-    pub fn reverse(&mut self) {
-        // 如果链表为空或只有一个元素，不需要反转
+    fn reverse(&mut self) {
+        // only one node, don't need to reverse
         if self.length <= 1 {
             return;
         }
+        std::mem::swap(&mut self.start, &mut self.end);
 
         let mut current = self.start;
-        let mut prev: Option<NonNull<Node<T>>> = None;
 
-        // 更新 end 指针为原来的 start
-        self.end = current;
-
-        while let Some(mut current_ptr) = current {
-            unsafe {
-                // 保存下一个节点
-                let next = (*current_ptr.as_ptr()).next;
-                
-                // 反转当前节点的指针
-                (*current_ptr.as_ptr()).next = prev;
-                (*current_ptr.as_ptr()).prev = next;
-
-                // 移动指针
-                prev = current;
-                current = next;
+        while let Some(mut current_node_ptr) = current {
+            unsafe { // unsafe operation
+                let current_node = current_node_ptr.as_mut();
+                std::mem::swap(&mut current_node.next, &mut current_node.prev);
+                current = current_node.next;
             }
         }
-
-        // 更新 start 指针为原来的 end
-        self.start = prev;
     }
 }
 
