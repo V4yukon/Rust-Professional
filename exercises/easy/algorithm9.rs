@@ -16,6 +16,7 @@ where
     comparator: fn(&T, &T) -> bool,
 }
 
+
 impl<T> Heap<T>
 where
     T: Default,
@@ -38,6 +39,20 @@ where
 
     pub fn add(&mut self, value: T) {
         //TODO
+        // Append the value and update count.
+        self.items.push(value);
+        self.count += 1;
+        // "Swim" up: Compare with parent and swap if needed.
+        let mut idx = self.count;
+        while idx > 1 {
+            let p = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[p]) {
+                self.items.swap(idx, p);
+                idx = p;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -57,8 +72,13 @@ where
     }
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
-        //TODO
-		0
+        let left = self.left_child_idx(idx);
+        let right = self.right_child_idx(idx);
+        if right <= self.count && (self.comparator)(&self.items[right], &self.items[left]) {
+            right
+        } else {
+            left
+        }
     }
 }
 
@@ -85,7 +105,29 @@ where
 
     fn next(&mut self) -> Option<T> {
         //TODO
-		None
+		if self.count == 0 {
+            return None;
+        }
+        // Remove the root element.
+        // Replace the root with the last element.
+        let root = std::mem::replace(&mut self.items[1], T::default());
+        let last = self.items.pop().unwrap();
+        self.count -= 1;
+        if self.count > 0 {
+            self.items[1] = last;
+            // "Sink" down: Swap with the appropriate child to restore heap invariant.
+            let mut idx = 1;
+            while self.left_child_idx(idx) <= self.count {
+                let child = self.smallest_child_idx(idx);
+                if (self.comparator)(&self.items[child], &self.items[idx]) {
+                    self.items.swap(idx, child);
+                    idx = child;
+                } else {
+                    break;
+                }
+            }
+        }
+        Some(root)
     }
 }
 
