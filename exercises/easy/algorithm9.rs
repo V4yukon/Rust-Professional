@@ -40,7 +40,19 @@ where
     pub fn add(&mut self, value: T) {
         //TODO
         // Append the value and update count.
-        
+        self.items.push(value);
+        self.count += 1;
+        // "Swim" up: Compare with parent and swap if needed.
+        let mut idx = self.count;
+        while idx > 1 {
+            let p = self.parent_idx(idx);
+            if (self.comparator)(&self.items[idx], &self.items[p]) {
+                self.items.swap(idx, p);
+                idx = p;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
